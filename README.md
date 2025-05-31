@@ -2550,3 +2550,1572 @@ sudo systemctl enable nginx
 ```
 
 ---
+
+
+# Lightsail 관련 개념
+
+---
+
+## ✅ Lightsail에서 SSH를 이용해 서버 접속 방법
+
+### 🔹 A. **Lightsail 웹 콘솔에서 직접 SSH 접속 (간단)**
+
+1. [https://lightsail.aws.amazon.com/](https://lightsail.aws.amazon.com/) 접속
+2. 인스턴스 선택
+3. **"연결"** 탭 클릭
+4. **브라우저 기반 SSH 터미널** 사용 (별도 설정 없이 가능)
+
+---
+
+### 🔹 B. **로컬 PC(리눅스/macOS/WSL)에서 SSH 키로 접속**
+
+### ① 키 파일 다운로드 (예: `LightsailDefaultKey-ap-northeast-2.pem`)
+
+- Lightsail 콘솔 > 계정 메뉴 > SSH 키 > 다운로드
+- 해당 키를 안전한 위치에 저장
+
+### ② 키 파일 권한 설정
+
+```bash
+chmod 400 LightsailDefaultKey-ap-northeast-2.pem
+
+```
+
+### ③ SSH 접속
+
+```bash
+ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@<인스턴스_IP>
+
+```
+
+예시:
+
+```bash
+ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
+
+```
+
+---
+
+### 🔹 C. **Windows 사용자라면 PuTTY로 접속 (pem → ppk 변환 필요)**
+
+1. `.pem` 파일을 **PuTTYgen**으로 `.ppk` 변환
+2. PuTTY에서 IP 입력 + `.ppk` 키 파일 등록
+3. 접속
+
+---
+
+## ✅ 접속 안 될 때 점검 체크리스트
+
+| 항목 | 확인 방법 |
+| --- | --- |
+| 인스턴스 실행 중인지 | Lightsail 콘솔에서 상태 확인 |
+| 공인 IP 맞는지 | 콘솔 > 인스턴스 > 네트워킹 탭 |
+| 방화벽에서 SSH(포트 22) 허용 중인지 | "네트워킹" > 포트 열림 여부 확인 |
+| 키 파일 권한 400인지 | `chmod 400` |
+| 키 파일 경로가 정확한지 | `ls -l` 로 경로 확인 |
+
+---
+
+## ✅ 명령어 의미 설명
+
+```bash
+sudo ln -s /etc/nginx/sites-available/pybo /etc/nginx/sites-enabled/
+
+```
+
+---
+
+- **심볼릭 링크(symlink)**  생성
+    - 즉, `sites-available/pybo` 파일을 `sites-enable/` 디렉토리 내에서 **가상으로 연결**
+
+---
+
+### 📁 Nginx 디렉토리 구조 개념
+
+| 경로 | 역할 |
+| --- | --- |
+| `/etc/nginx/sites-available/` | 사이트 설정 파일 보관소 (비활성 포함) |
+| `/etc/nginx/sites-enabled/` | Nginx가 실제로 적용할 활성화된 설정들 |
+| `/etc/nginx/nginx.conf` | `sites-enabled/*` 를 include함 |
+
+---
+
+### ⚙️ 작동 방식
+
+- `sites-available/` 폴더에 설정 파일을 만들어도,
+- `sites-enabled/`에 **심볼릭 링크**가 없으면 Nginx는 해당 설정을 무시함.
+- 즉, 설정을 **"활성화"** 하려면 `ln -s` 명령으로 연결해야 합니다.
+
+---
+
+## ✅ 그 다음에는?
+
+- 설정이 잘 연결되었는지 확인:
+
+```bash
+ls -l /etc/nginx/sites-enabled/
+
+```
+
+- → `pybo → ../sites-available/pybo` 형식으로 링크가 보여야 함
+- 그리고 나서:
+
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
+
+```
+
+---
+
+## 📌 비유
+
+`sites-available/` = 전시용 메뉴판
+
+`sites-enabled/` = 실제 테이블에 놓이는 메뉴판
+
+`ln -s` = "이 설정 써주세요!" 라는 표시
+
+---
+
+## ✅ 개념: `심볼릭 링크 (symbolic link, symlink)`
+
+- **다른 파일이나 디렉토리에 대한 "참조(바로가기)" 파일**
+- 마치 **Windows의 "바로가기 아이콘"** 과 비슷
+
+---
+
+## ✅ 심볼릭 링크란?
+
+> 심볼릭 링크는 원본 파일의 경로를 담고 있는 얇은 껍데기
+> 
+> 
+> 링크를 열면 실제 원본 파일이 열림
+> 
+
+---
+
+### 📌 예시
+
+```bash
+ln -s /home/ubuntu/원본.txt 링크.txt
+
+```
+
+- `링크.txt`는 실제로 존재하지 않으며
+- `원본.txt`를 가리키는 "가상 파일"
+- `cat 링크.txt` 하면 실제 `원본.txt` 내용이 출력됨
+
+---
+
+## ✅ 심볼릭 링크 vs 하드 링크 비교
+
+| 항목 | 심볼릭 링크 (`ln -s`) | 하드 링크 (`ln`) |
+| --- | --- | --- |
+| 독립성 | 원본 삭제 시 깨짐 ❌ | 원본 삭제해도 유지됨 ✅ |
+| 크기 | 아주 작음 (경로만 저장) | 실제 파일과 동일 |
+| 디렉토리 링크 가능 여부 | 가능 ✅ | 불가 ❌ (일반적으로) |
+| 파일 시스템 경계 넘기기 | 가능 ✅ | 불가 ❌ |
+| 용도 | 설정 연결, 바로가기 등 | 동일한 파일 다중 이름 |
+
+---
+
+### 📂 Nginx에서 왜 쓰는가?
+
+- `/etc/nginx/sites-available/` → 설정 파일 저장소
+- `/etc/nginx/sites-enabled/` → 실제 적용할 설정 모음
+
+```bash
+sudo ln -s /etc/nginx/sites-available/pybo /etc/nginx/sites-enabled/
+
+```
+
+→ `sites-enabled/pybo` 는 원본 파일을 그대로 가리킴
+
+→ `nginx.conf`는 `/etc/nginx/sites-enabled/*` 를 include 하므로, 설정이 반영됨
+
+---
+
+## ✅ 확인 방법
+
+```bash
+ls -l
+
+```
+
+출력 예:
+
+```
+pybo -> ../sites-available/pybo
+
+```
+
+→ `pybo`는 symlink이며 `../sites-available/pybo`를 가리킴
+
+---
+
+## ✅ 삭제도 안전하게 가능
+
+링크만 삭제:
+
+```bash
+sudo rm /etc/nginx/sites-enabled/pybo
+
+```
+
+→ 원본 파일은 **절대 삭제되지 않음**
+
+---
+
+## ✅ 개념: `systemd 리로드`란?
+
+- **서비스 설정 파일을 변경한 후 이를 시스템에 반영**하는 과정
+
+> systemd는 리눅스에서 서비스를 관리하는 init 시스템입니다.
+> 
+> 
+> `systemd`는 `/etc/systemd/system/*.service` 파일에 정의된 내용을 읽어 **서비스 실행 방식**을 결정합니다.
+> 
+
+💡 그런데 `.service` 파일을 수정했을 경우, 단순히 `restart`만 해서는 변경 사항이 반영되지 않음.
+
+---
+
+## ✅ 리로드 명령어
+
+```bash
+sudo systemctl daemon-reload
+
+```
+
+---
+
+## ✅ 언제 `daemon-reload`가 필요한가?
+
+| 상황 | 설명 |
+| --- | --- |
+| `.service` 파일을 새로 만들었을 때 | systemd가 아직 해당 파일을 모름 |
+| 기존 `.service` 내용을 수정했을 때 | ExecStart, WorkingDirectory 등 변경 |
+| `UMask`, 환경 변수 추가 시 | 적용 안 되므로 반드시 리로드 필요 |
+
+---
+
+## ✅ 관련 명령 정리
+
+| 명령어 | 역할 |
+| --- | --- |
+| `sudo systemctl daemon-reload` | **service 설정을 다시 읽음** (반드시 필요) |
+| `sudo systemctl start <서비스>` | 서비스 시작 |
+| `sudo systemctl restart <서비스>` | 재시작 |
+| `sudo systemctl enable <서비스>` | 부팅 시 자동 시작 |
+| `sudo systemctl status <서비스>` | 상태 확인 |
+
+---
+
+## ✅ 예시 (Gunicorn 서비스 변경 후)
+
+1. 서비스 파일 수정
+
+```bash
+sudo nano /etc/systemd/system/gunicorn.service
+
+```
+
+1. 리로드
+
+```bash
+sudo systemctl daemon-reload
+
+```
+
+1. 재시작
+
+```bash
+sudo systemctl restart gunicorn
+
+```
+
+---
+
+## ✅ 왜 "daemon" 리로드인가?
+
+- `systemd`는 데몬(daemon)으로 상시 동작합니다
+- `daemon-reload`는 systemd가 **파일 시스템에서 서비스 정의 파일을 다시 읽어들이는 작업**입니다
+
+---
+
+## 📌 주의
+
+`daemon-reload`는 서비스 재시작을 하지 않으므로, **변경 반영을 위해 반드시 `restart`도 같이 함.**
+
+---
+
+---
+
+## ✅ `proxy_pass` 정의
+
+> proxy_pass는 Nginx가 받은 클라이언트 요청을 다른 서버(예: Gunicorn, Node.js, API 서버 등)로 전달(proxy) 하는 역할 수행
+> 
+- **Nginx에서 요청을 다른 서버(백엔드)로 전달하는 데 사용하는 지시어**
+- 주로 **리버스 프록시(reverse proxy)** 역할을 할 때 사용
+
+---
+
+## ✅ 예시: Django + Gunicorn
+
+```
+location / {
+    include /etc/nginx/proxy_params;
+    **proxy_pass** http://unix:/home/ubuntu/pybo/pybo.sock;
+}
+
+```
+
+- 클라이언트가 `/` 요청 → Nginx가 수신
+- Nginx는 해당 요청을 `pybo.sock` 소켓을 통해 Gunicorn에게 전달
+- Gunicorn이 Django 앱으로 요청을 처리
+
+---
+
+## ✅ 주요 사용 목적
+
+| 목적 | 예 |
+| --- | --- |
+| 웹서버(Nginx)가 백엔드(Gunicorn)에 요청 전달 | Django 앱 배포 |
+| API Gateway 역할 수행 | REST API 분산 처리 |
+| 로드 밸런싱 | 여러 백엔드로 트래픽 분산 |
+| HTTPS → HTTP 전달 | TLS termination proxy |
+
+---
+
+## ✅ proxy_pass 구문 예시
+
+### 1. HTTP 서버로 전달
+
+```
+proxy_pass http://127.0.0.1:8000;
+
+```
+
+→ 로컬에서 실행 중인 HTTP 서버로 전달
+
+---
+
+### 2. 유닉스 도메인 소켓으로 전달
+
+```
+proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
+
+```
+
+→ Gunicorn이 만든 `.sock` 파일을 통해 Django에 전달
+
+---
+
+### 3. 외부 서버로 전달
+
+```
+proxy_pass http://api.example.com;
+
+```
+
+→ API 서버나 외부 호스트로 요청을 넘김
+
+---
+
+## ✅ 함께 자주 쓰이는 설정들
+
+```
+location / {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+
+```
+
+이들은 클라이언트의 원본 IP나 헤더 정보를 백엔드에 전달하기 위한 설정
+
+---
+
+## ✅ 그림으로 이해
+
+```
+[브라우저 요청]
+      ↓
+[Nginx (proxy_pass)]
+      ↓
+[Gunicorn 또는 외부 서버]
+
+```
+
+---
+
+## ✅ 요약
+
+| 항목 | 내용 |
+| --- | --- |
+| 용도 | Nginx가 요청을 다른 서버로 전달 |
+| 자주 쓰는 대상 | Gunicorn, Flask, Node.js, 외부 API |
+| 형식 | `proxy_pass http://IP:PORT;` 또는 `proxy_pass http://unix:/path/to/.sock;` |
+| 위치 | Nginx 설정의 `location` 블록 안 |
+
+---
+
+---
+
+## ✅ `.sock` 파일 정의
+
+> .sock 파일은 같은 서버 안에서 애플리케이션 간 데이터를 주고받기 위한 통신 채널을 제공하는 **소켓 파일(파일 시스템에 존재하는 소켓)**
+> 
+- `.sock` 파일은 **Unix Domain Socket(UDS)** 파일로, **같은 서버 내의 프로세스들 간의 통신을 위한 특수한 파일**
+
+---
+
+## ✅ 예: Django + Gunicorn + Nginx
+
+### 예시 `.sock` 경로
+
+```
+/home/ubuntu/pybo/pybo.sock
+
+```
+
+- Gunicorn이 Django 앱을 실행하면서 `.sock` 파일을 생성
+- Nginx는 이 `.sock` 파일을 통해 Gunicorn과 통신
+
+---
+
+## ✅ 언제 쓰는가?
+
+| 목적 | 예시 |
+| --- | --- |
+| **동일 서버에서 프로세스 간 통신** | Nginx → Gunicorn |
+| **HTTP 포트 대신 빠르고 보안성 높은 통신** | `proxy_pass http://unix:/path/to/app.sock;` |
+| **네트워크 소켓 대신 로컬 전용 연결** | 외부 노출 없이 통신 |
+
+---
+
+## ✅ 왜 `.sock`을 사용하는가?
+
+| 항목 | 이유 |
+| --- | --- |
+| 성능 | 같은 시스템 내에서 TCP보다 빠름 |
+| 보안 | 외부 노출이 없고 권한으로 제어 가능 |
+| 포트 불필요 | `127.0.0.1:8000` 같은 포트를 쓰지 않음 |
+| 시스템 리소스 절약 | 로컬 전용 I/O라서 효율적 |
+
+---
+
+## ✅ 어떻게 생성되는가?
+
+Gunicorn 실행 시:
+
+```bash
+gunicorn --bind unix:/home/ubuntu/pybo/pybo.sock config.wsgi:application
+
+```
+
+→ 위 명령으로 `.sock` 파일이 생성됨
+
+---
+
+## ✅ Nginx에서 사용하는 방식
+
+```
+location / {
+    include /etc/nginx/proxy_params;
+    proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
+}
+
+```
+
+→ 클라이언트 요청을 이 `.sock` 파일을 통해 Gunicorn으로 전달
+
+---
+
+## ✅ 권한이 중요합니다
+
+`.sock` 파일은 "파일"처럼 동작하기 때문에, **퍼미션(permission)**이 매우 중요합니다.
+
+```bash
+ls -l pybo.sock
+
+```
+
+예:
+
+```
+srw-rw---- 1 ubuntu www-data pybo.sock
+
+```
+
+| 항목 | 의미 |
+| --- | --- |
+| `s` | 소켓 파일 |
+| `rw-rw----` | 소유자, 그룹만 읽기/쓰기 가능 |
+| `ubuntu:www-data` | Gunicorn이 생성, Nginx가 접근 가능 |
+
+---
+
+## ✅ 요약
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 타입 | Unix Domain Socket (`srwxrwxrwx`) |
+| 생성 주체 | Gunicorn, Flask, uWSGI 등 |
+| 사용 목적 | 같은 서버 내 고속, 보안 통신 |
+| 위치 예시 | `/run/app/app.sock`, `/home/ubuntu/pybo/pybo.sock` |
+| Nginx 연동 | `proxy_pass http://unix:/...` 로 전달 |
+
+---
+
+---
+
+## ✅ 프록시(proxy) 정의
+
+> **프록시(proxy)**는 클라이언트의 요청을 대신 받아서, 다른 서버에 전달하고 응답을 다시 중계하는 중간 역할자
+> 
+- 웹 개발에서 자주 등장하는 개념이며, 특히 **웹 서버(Nginx)**, **API 서버**, **로드 밸런서** 등에서 중요한 역할
+
+---
+
+## ✅ 그림으로 이해
+
+```
+[사용자 브라우저]
+        ↓  요청
+     [Nginx 프록시 서버]
+        ↓  전달 (proxy_pass)
+     [Gunicorn + Django]
+        ↓  응답
+     [Nginx]
+        ↓  응답 전달
+[사용자 브라우저]
+
+```
+
+---
+
+## ✅ 실생활 비유
+
+- 사용자가 직접 통신하는 대신 **대리인(프록시 서버)**에게 전달을 요청
+- 프록시가 서버와 대신 통신하고, 사용자에게 결과를 넘겨줌
+
+---
+
+## ✅ proxy의 역할 (전달 방식)
+
+| 역할 | 설명 |
+| --- | --- |
+| **요청 중계** | 클라이언트 요청을 백엔드 서버로 전달 |
+| **응답 전달** | 백엔드 서버 응답을 사용자에게 전달 |
+| **보안 강화** | 내부 서버 IP 숨김, 방화벽 역할 가능 |
+| **로드 밸런싱** | 여러 서버로 요청을 분산 가능 |
+| **캐싱, 압축** | 정적 파일 캐시, 응답 압축 가능 |
+
+---
+
+## ✅ 실전: Nginx의 `proxy_pass`
+
+```
+location / {
+    proxy_pass http://127.0.0.1:8000;
+}
+
+```
+
+> Nginx가 클라이언트의 요청을 127.0.0.1:8000 (Gunicorn 등 백엔드 서버)에 전달(proxy) 한다는 의미.
+> 
+
+또는:
+
+```
+proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
+
+```
+
+> .sock을 통해 Django 앱(Gunicorn)으로 프록시 전달
+> 
+
+---
+
+## ✅ 요약
+
+| 용어 | 의미 |
+| --- | --- |
+| proxy | 중간 전달자 역할 (대리 요청 및 응답 전달) |
+| proxy_pass | Nginx에서 백엔드로 요청을 "전달"하는 설정 |
+| 리버스 프록시 | 클라이언트를 대신해 내부 서버와 통신 |
+
+---
+
+## 💡 관련 용어 비교
+
+| 용어 | 설명 |
+| --- | --- |
+| **proxy** | 전달자 역할, 주로 중간 서버 |
+| **forwarding** | 한 요청을 다른 목적지로 넘김 (동일 개념) |
+| **gateway** | 여러 시스템을 연결하는 입구 역할 |
+| **tunneling** | 요청을 통째로 감춰서 전달 (ex: HTTPS 프록시) |
+
+---
+
+---
+
+## ✅ 프록시 서버의 주요 종류
+
+- 프록시 서버(proxy server)는 클라이언트와 서버 사이에서 **중간자 역할을 하며 요청을 대신 전달**하는 시스템인데, 용도와 구조에 따라 여러 종류로 나눔
+
+| 분류 기준 | 종류 | 설명 |
+| --- | --- | --- |
+| 방향 기준 | **정방향 프록시 (Forward Proxy)** | 클라이언트 → 프록시 → 외부 서버 (사용자 익명성 보장 등) |
+|  | **리버스 프록시 (Reverse Proxy)** ✅ | 클라이언트 → 프록시 → 내부 서버 (웹서버 앞단, Nginx 등) |
+| 캐싱 여부 | **캐싱 프록시 (Caching Proxy)** | 자주 요청되는 데이터를 저장하고 응답 속도 향상 |
+| 보안 용도 | **웹 필터 프록시** | 유해 사이트 차단, 접근 제어 |
+| 로드 밸런싱 | **로드 밸런싱 프록시** | 여러 백엔드 서버로 요청 분산 |
+| 트래픽 처리 | **SSL 터미네이션 프록시** | HTTPS → HTTP 복호화 처리 (예: Nginx에서 TLS 종료) |
+| 네트워크 계층 | **SOCKS 프록시** | 네트워크 수준에서 모든 트래픽을 프록시 (ex: Tor, Shadowsocks) |
+| VPN 유사 | **Transparent Proxy** | 클라이언트 설정 없이 자동으로 트래픽 중계 |
+| CDN 기반 | **콘텐츠 전송 프록시** | 전 세계에 콘텐츠를 캐시 및 전달 (예: Cloudflare, Akamai) |
+
+---
+
+## ✅ 두 종류 비교 (Forward vs Reverse)
+
+| 항목 | Forward Proxy | Reverse Proxy |
+| --- | --- | --- |
+| 위치 | 사용자 앞단 (클라이언트 근처) | 서버 앞단 (서버 근처) |
+| 목적 | 사용자의 익명성, 방화벽 우회 | 로드 밸런싱, SSL 종료, 보안, 성능 향상 |
+| 예 | Squid, 프라이버시 프록시 | Nginx, HAProxy, AWS ALB |
+
+---
+
+## ✅ 예시
+
+### 🔹 Forward Proxy (클라이언트 기준)
+
+```
+[User PC] → [Proxy Server] → [Blocked Website]
+
+```
+
+- 내가 누구인지 숨기고 **(클라이언트를 숨김)** 외부에 접속 (Tor 브라우저도 이 구조)
+
+---
+
+### 🔹 Reverse Proxy (서버 기준) ✅
+
+```
+[Client] → [Nginx] → [Gunicorn, Flask, Node.js, etc.]
+
+```
+
+- 클라이언트는 실제 서버를 모름 **(서버를 숨김)**
+    - Nginx가 모든 요청을 받아 내부 앱 서버로 전달
+
+---
+
+## ✅ 결론
+
+- 지금 사용하는 것은?
+
+---
+
+✅
+
+**Reverse Proxy**
+
+: Nginx가 클라이언트 요청을 Gunicorn + Django 앱으로 전달하는 구조
+
+---
+
+---
+
+---
+
+## ✅ **Forward Proxy(정방향 프록시)** 정의
+
+> Forward Proxy는 클라이언트를 대신해 외부 인터넷 자원에 접근하는 중계 서버
+> 
+- 즉, 사용자의 요청을 받아 외부 서버에 전달하고, 그 응답을 다시 사용자에게 돌려주는 **대리인 역할**
+
+---
+
+## 🧭 기본 구조
+
+```
+[User(Client)] → [Forward Proxy] → [Web Server]
+
+```
+
+예:
+
+사용자가 Google에 접속하려고 하면,
+
+프록시 서버가 대신 접속하고 결과를 사용자에게 전달
+
+---
+
+## ✅ Forward Proxy의 주요 특징
+
+| 항목 | 내용 |
+| --- | --- |
+| **대상** | 클라이언트 중심 (사용자 앞단) |
+| **위치** | 사용자의 로컬 네트워크 또는 VPN 게이트웨이 |
+| **주요 기능** | 익명성 제공, 접근 제어, 캐싱, 모니터링 |
+| **용도** | 방화벽 우회, 웹 필터링, 콘텐츠 차단, 로깅 |
+| **클라이언트 설정 필요** | 예. 브라우저에 프록시 서버 IP:PORT 설정 필요 |
+
+---
+
+## ✅ 실제 사용 사례
+
+| 사용처 | 설명 |
+| --- | --- |
+| 학교나 회사 | **유해 사이트 차단** 및 인터넷 사용 기록 관리 |
+| 중국 등 국가 | **방화벽 우회(GFW)** → 외부 사이트 접속 허용 |
+| 개인 사용 | IP 숨기기, 위치 우회 (VPN, Tor 브라우저와 유사) |
+
+---
+
+## ✅ 예시로 보는 작동 방식
+
+### 🔹 상황
+
+1. 회사 내부 사용자 → `youtube.com` 접속 요청
+2. 회사의 **Forward Proxy 서버**가 요청을 받고 대신 `youtube.com`에 접속
+3. 응답을 받아 사용자에게 다시 전달
+
+### 🔹 장점
+
+- 외부로 나가는 트래픽 제어 가능
+- 내부 사용자의 IP 주소를 숨길 수 있음
+
+---
+
+## ✅ Forward Proxy vs VPN vs Tor
+
+| 항목 | Forward Proxy | VPN | Tor |
+| --- | --- | --- | --- |
+| 트래픽 암호화 | ❌ (기본적으로 없음) | ✅ | ✅ |
+| IP 변경 | ✅ | ✅ | ✅ (랜덤 노드) |
+| 전체 트래픽 처리 | ❌ (웹만) | ✅ | ✅ |
+| 속도 | 빠름 | 중간 | 느림 |
+| 구성 난이도 | 쉬움 | 중간 | 중간~어려움 |
+
+---
+
+## ✅ 구현 예시
+
+- **Squid Proxy**: 가장 널리 쓰이는 Forward Proxy 서버
+- **Privoxy**, **Polipo**, **Tinyproxy**: 경량 HTTP 프록시
+
+---
+
+## ✅ 요약
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 클라이언트 요청을 외부로 대리 전송 |
+| 위치 | 클라이언트 앞단 |
+| 장점 | 익명성, 접근 제어, 캐싱, 필터링 |
+| 대표 소프트웨어 | Squid, Privoxy |
+| 클라이언트 설정 필요 | 브라우저나 OS에 수동 프록시 주소 지정 필요 |
+
+---
+
+---
+
+## ✅ **Reverse Proxy(리버스 프록시)**  정의
+
+> Reverse Proxy(리버스 프록시) 는 클라이언트의 요청을 대신 받아 내부 서버(백엔드 서버)에 전달하고 응답을 중계하는 중간 서버.
+> 
+
+---
+
+## ✅ 기본 구조
+
+```
+[Client] → [Reverse Proxy] → [Backend Server (ex. Gunicorn, Node.js, API)]
+
+```
+
+- 클라이언트는 내부 서버를 직접 알지 못하며,
+- **리버스 프록시만 접촉**
+
+---
+
+## ✅ 대표적인 리버스 프록시 소프트웨어
+
+| 소프트웨어 | 특징 |
+| --- | --- |
+| **Nginx** | 가볍고 빠름, 정적 파일 캐싱도 가능 |
+| **Apache (mod_proxy)** | 오래된 전통적인 웹 서버 기능 |
+| **HAProxy** | 고성능 로드 밸런서 |
+| **Traefik** | Docker/Kubernetes 친화적 |
+
+---
+
+## ✅ Reverse Proxy의 주요 역할
+
+| 역할 | 설명 |
+| --- | --- |
+| 🔁 **요청 중계** | 외부 요청을 내부 서버에 대신 전달 |
+| 🛡️ **보안 강화** | 내부 서버 IP, 포트 숨김 (보안 경계 역할) |
+| 📊 **로드 밸런싱** | 여러 서버에 요청을 분산 처리 |
+| 🧊 **정적 파일 캐싱** | 이미지, JS 등을 미리 캐싱하여 응답 속도 향상 |
+| 🔐 **HTTPS 종료(TLS termination)** | SSL 인증서를 프록시가 처리하여 백엔드는 HTTP 사용 |
+
+---
+
+## ✅ 예시 1: Django + Gunicorn + Nginx
+
+```
+[Client] → [Nginx] → [Gunicorn] → [Django 앱]
+
+```
+
+- Nginx가 리버스 프록시 역할을 수행
+- 클라이언트는 Gunicorn을 직접 접촉하지 않음
+- `proxy_pass` 지시어를 통해 내부 요청 전달
+
+```
+location / {
+    proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
+}
+
+```
+
+---
+
+## ✅ 예시 2: 로드 밸런싱
+
+```
+[Client] → [HAProxy] → [서버1, 서버2, 서버3]
+
+```
+
+- Reverse Proxy가 요청을 서버에 분산 전달
+- 서버 장애 시 자동 failover 처리 가능
+
+---
+
+## ✅ Forward Proxy vs Reverse Proxy
+
+| 항목 | Forward Proxy | Reverse Proxy |
+| --- | --- | --- |
+| 위치 | 클라이언트 앞단 | 서버 앞단 |
+| 요청 대상 | 클라이언트가 프록시를 통해 외부에 접근 | 외부 요청이 프록시를 통해 내부로 전달 |
+| 목적 | 익명성, 우회, 제한 | 로드밸런싱, 보안, SSL 종료 |
+| 예 | Squid, Tor | Nginx, HAProxy |
+
+---
+
+## ✅ 장점 정리
+
+| 기능 | 설명 |
+| --- | --- |
+| ✅ 보안 | 내부 시스템 구조를 숨김 |
+| ✅ 확장성 | 트래픽 증가 시 서버 증설 후 로드밸런싱 |
+| ✅ 인증 처리 | 모든 요청에 대해 인증 필터링 가능 |
+| ✅ 로그 통합 | 여러 백엔드 로그를 프록시에서 통합 가능 |
+| ✅ HTTPS 처리 | 백엔드 서버가 HTTPS를 몰라도 OK |
+
+---
+
+## ✅ 실무 상황에서의 적용
+
+- **Django** 개발 시: `Gunicorn`은 백엔드 실행, `Nginx`가 리버스 프록시
+- **React + Spring** 웹사이트: Nginx가 `/api/` 요청은 Spring에, `/` 요청은 React 앱으로 분기
+- **Docker/Kubernetes**: `Traefik`, `Ingress` 컨트롤러가 리버스 프록시 역할
+
+---
+
+## ✅ 요약
+
+| 항목 | 설명 |
+| --- | --- |
+| 정의 | 클라이언트 대신 요청을 받아 내부 서버로 전달 |
+| 위치 | 웹 서버나 API 앞단 |
+| 기능 | 보안, HTTPS 처리, 캐싱, 로드 밸런싱 |
+| 실무 활용 | Nginx + Gunicorn, API Gateway, Microservices |
+
+---
+
+## ✅ Forward Proxy 동작 과정
+
+### 📍 상황 예시:
+
+> 당신이 회사 네트워크에서 https://www.youtube.com에 접속하고자 할 때
+> 
+> 
+> 회사에서 Forward Proxy를 설정해두었다면...
+> 
+> - **클라이언트가 YouTube에 접속을 요청하면**, **Forward Proxy**는 그 요청을 받아 **자신이 YouTube에 대신 접속한 뒤**, 응답을 다시 클라이언트에게 전달
+
+---
+
+### 🔁 요청 흐름:
+
+```
+[당신의 PC]
+   ↓ 요청: youtube.com
+[Forward Proxy 서버]
+   ↓ 요청 재전송: youtube.com
+[YouTube 서버 (외부)]
+   ↓ 응답
+[Forward Proxy 서버]
+   ↓ 응답 전달
+[당신의 PC]
+
+```
+
+---
+
+## ✅ 왜 이렇게 하나요?
+
+| 목적 | 설명 |
+| --- | --- |
+| 🔒 **보안** | 사용자가 직접 외부와 통신하지 않게 함 (접근 통제) |
+| 📋 **모니터링** | 어떤 사용자가 어떤 사이트에 접속했는지 추적 가능 |
+| 🧱 **차단/허용** | 특정 사이트(예: YouTube)만 차단하거나 허용 |
+| 💾 **캐싱** | 자주 보는 콘텐츠를 프록시가 미리 저장해 응답 속도 향상 |
+
+---
+
+## ✅ 예시: 방화벽 우회도 가능
+
+- 만약 어떤 국가나 기관이 `YouTube`를 **차단**한 경우,
+- Forward Proxy가 **해외 서버에 위치**해 있다면,
+- 사용자는 그 Proxy를 통해 **차단된 콘텐츠**에 접속할 수 있습니다.
+
+---
+
+## ✅ Forward Proxy 특징 요약
+
+| 항목 | 설명 |
+| --- | --- |
+| 요청 주체 | **클라이언트** (사용자가 프록시 설정) |
+| 프록시 위치 | 사용자 앞단 (사용자 쪽 네트워크) |
+| 클라이언트 설정 필요 | ✅ 브라우저 또는 OS에서 프록시 IP/포트 지정 |
+| 서버 입장에서는 | 요청자가 Proxy로 보임 (실제 사용자는 감춰짐) |
+
+---
+
+## 🔒 HTTPS는 어떻게 될까?
+
+- HTTPS 요청도 Forward Proxy를 통해 전달되지만,
+    
+    실제 내용은 **암호화되어 전달되므로** 프록시는 내용을 볼 수 없습니다.
+    
+- 다만 **프록시는 어느 사이트에 연결했는지는 알 수 있습니다** (도메인 기반 제어 가능).
+
+---
+
+---
+
+## ✅ 대표적인 Forward Proxy **(정방향 프록시)**  소프트웨어
+
+| 이름 | 특징 | 설명 |
+| --- | --- | --- |
+| **Squid** ✅ | 오픈소스, 고성능 | 가장 널리 사용되는 HTTP/HTTPS 캐싱 프록시 서버 |
+| **Privoxy** | 개인정보 보호 | 광고 차단 및 프라이버시 보호 기능 강화 |
+| **Polipo** (비활성화됨) | 경량 | 간단한 HTTP 캐시 및 프록시, 현재는 유지보수 중단 |
+| **TinyProxy** | 초경량 | 임베디드 시스템이나 저사양 서버에 적합 |
+| **Shadowsocks** | 중국 등 검열 우회 | SOCKS5 기반의 프록시, VPN 대안으로 사용 |
+| **Tor** | 완전한 익명성 | Onion routing으로 IP 추적 방지, 다단계 프록시 구성 |
+| **Bluecoat ProxySG** | 상용 | 기업용 고급 기능 제공 (웹 필터링, 로그 기록 등) |
+
+---
+
+## ✅ 가장 널리 쓰이는 대표: **Squid**
+
+### 📌 Squid의 특징:
+
+- 오픈소스
+- HTTP/HTTPS 지원
+- 캐싱 기능 → 웹페이지 로딩 속도 향상
+- ACL(접근 제어 목록)로 사이트 차단/허용 가능
+- 프록시 인증 기능 (사용자별 로그 추적)
+
+### 🛠️ Squid 사용 예시:
+
+```bash
+sudo apt install squid
+sudo nano /etc/squid/squid.conf
+
+```
+
+설정 후, 브라우저에서 프록시 서버 IP와 포트를 지정해 사용
+
+---
+
+## ✅ 구분: Forward Proxy vs SOCKS Proxy
+
+| 종류 | 설명 | 예시 |
+| --- | --- | --- |
+| HTTP Forward Proxy | 웹 요청 전용 | Squid, Privoxy |
+| SOCKS Proxy | 모든 TCP/UDP 트래픽 | Shadowsocks, Tor, dante |
+
+---
+
+## ✅ 정리
+
+> **Forward Proxy의 대표는 "Squid"**이며,
+> 
+> 
+> 프라이버시 강화가 목적이면 "Privoxy",
+> 
+> 성능 위주라면 "TinyProxy",
+> 
+> 검열 우회라면 "Shadowsocks" 또는 "Tor"가 대표적
+> 
+
+---
+
+## ✅ `tail` 기본 형식
+
+- `tail`은 리눅스/유닉스 계열 시스템에서 **파일의 마지막 부분을 출력**하는 명령어
+- 로그 확인이나 실시간 출력 확인에 매우 자주 사용
+
+```bash
+tail [옵션] [파일명]
+
+```
+
+---
+
+## ✅ 예시
+
+```bash
+tail /var/log/syslog
+
+```
+
+→ `/var/log/syslog` 파일의 **마지막 10줄(default)** 출력
+
+---
+
+## ✅ 자주 쓰는 옵션들
+
+| 명령어 | 설명 |
+| --- | --- |
+| `tail -n 50 파일명` | 마지막 50줄 출력 |
+| `tail -f 파일명` ✅ | **실시간 출력 감시** (log 파일 확인 시 매우 유용) |
+| `tail -F 파일명` | 파일이 삭제/재생성돼도 계속 추적 (logrotate 대비) |
+| `tail -q 파일1 파일2` | 여러 파일 출력 시 파일명 표시 생략 |
+
+---
+
+### 📌 실전 예시
+
+```bash
+# Nginx 에러 로그의 마지막 30줄
+tail -n 30 /var/log/nginx/error.log
+
+# 실시간으로 Django Gunicorn 로그 확인
+tail -f /home/ubuntu/pybo/gunicorn.log
+
+```
+
+---
+
+## ✅ `tail -f` vs `cat -f`?
+
+- `cat`은 전체 파일을 한번에 출력
+- `tail -f`는 **새 로그가 추가될 때만 출력**, 시스템 모니터링에 적합
+
+---
+
+## ✅ Ctrl + C 로 종료
+
+`tail -f`는 종료되지 않기 때문에, 끝내려면:
+
+```bash
+Ctrl + C
+
+```
+
+---
+
+## ✅ 함께 쓰면 좋은 명령
+
+| 명령 | 설명 |
+| --- | --- |
+| `grep` | 특정 문자열만 필터링: `tail -f access.log | grep ERROR` |
+| `less` | `tail access.log |
+| `awk` | 필드 기반 분석 가능 |
+
+---
+
+## ✅ 요약
+
+| 명령어 | 기능 |  |
+| --- | --- | --- |
+| `tail file.log` | 마지막 10줄 출력 |  |
+| `tail -n 50 file.log` | 마지막 50줄 출력 |  |
+| `tail -f file.log` | 파일이 업데이트될 때 실시간 출력 |  |
+| `tail -F file.log` | logrotate 시 재연결 지원 |  |
+
+---
+
+## ✅ 데몬 실행 상태 확인 명령어
+
+- `데몬(daemon)`이란 **백그라운드에서 실행되는 서비스 프로그램**
+    - 예를 들어 웹서버(Nginx), 데이터베이스(MySQL), 애플리케이션 서버(Gunicorn) 등이 모두 데몬으로 실행됨
+
+### 1. `systemctl status <서비스명>`
+
+```bash
+sudo systemctl status nginx
+sudo systemctl status gunicorn
+
+```
+
+→ 서비스가 실행 중인지, 중지되었는지, 실패했는지를 보여줌
+
+예:
+
+```bash
+● gunicorn.service - Gunicorn daemon
+   Loaded: loaded (/etc/systemd/system/gunicorn.service)
+   Active: active (running) since ...
+
+```
+
+---
+
+### 2. `ps aux | grep <프로세스명>`
+
+```bash
+ps aux | grep nginx
+ps aux | grep gunicorn
+
+```
+
+→ 현재 실행 중인 프로세스를 확인.
+
+- 프로세스 PID, 메모리 사용량, 실행 경로 등을 확인.
+
+---
+
+### 3. `pgrep <프로세스명>`
+
+```bash
+pgrep nginx
+pgrep gunicorn
+
+```
+
+→ 해당 이름의 **실행 중인 PID 목록**만 간단히 출력.
+
+---
+
+### 4. `netstat` 또는 `ss` 명령으로 포트 확인
+
+```bash
+sudo netstat -tulnp | grep 8000
+sudo ss -tulnp | grep 80
+
+```
+
+→ 데몬이 **포트를 열고 있는지** 확인 (웹 서비스의 경우 유용)
+
+---
+
+### 5. `journalctl` 로 로그 확인
+
+```bash
+journalctl -u gunicorn.service -f
+journalctl -u nginx -n 100
+
+```
+
+→ 특정 서비스의 실행 로그 확인 (에러 추적에 유용)
+
+---
+
+## ✅ 예시: Gunicorn 데몬 확인
+
+```bash
+sudo systemctl status gunicorn
+
+```
+
+출력 예:
+
+```
+● gunicorn.service - Gunicorn daemon
+     Active: active (running) since ...
+     Main PID: 1234
+
+```
+
+---
+
+## ✅ 요약
+
+| 명령어 | 용도 |
+| --- | --- |
+| `systemctl status <서비스>` | 데몬 실행 상태 확인 |
+| `ps aux | grep <이름>` |
+| `pgrep <이름>` | 실행 중 PID 확인 |
+| `netstat` 또는 `ss` | 열려 있는 포트 확인 |
+| `journalctl -u <서비스>` | 실행 로그 확인 |
+
+---
+
+---
+
+## ✅ `ps aux | grep nginx` 명령어 구성
+
+- 리눅스에서 **Nginx 관련 프로세스를 확인**하는 데 사용되는 명령어
+
+```bash
+ps aux | grep nginx
+
+```
+
+| 부분 | 의미 |
+| --- | --- |
+| `ps` | 프로세스 상태(process status)를 확인 |
+| `aux` | 전체 사용자/세션의 모든 프로세스 보여줌 (아래 참고) |
+| ` | ` |
+| `grep nginx` | "nginx"라는 문자열이 포함된 줄만 필터링 |
+
+---
+
+## ✅ `ps aux`의 각 항목 의미
+
+```bash
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       1638  0.0  0.5  55228  2200 ?        Ss   07:43   0:00 nginx: master process /usr/sbin/nginx -g ...
+www-data   1639  0.0  1.3  55896  5912 ?        S    07:43   0:00 nginx: worker process
+
+```
+
+| 항목 | 설명 |
+| --- | --- |
+| USER | 프로세스를 실행한 사용자 |
+| PID | 프로세스 ID |
+| %CPU | CPU 사용률 |
+| %MEM | 메모리 사용률 |
+| VSZ | 가상 메모리 크기 (KB) |
+| RSS | 실제 메모리 사용량 (KB) |
+| STAT | 프로세스 상태 (`S`: 슬립, `R`: 실행중, `Z`: 좀비 등) |
+| COMMAND | 실행 중인 명령 전체 경로 및 인자 |
+
+---
+
+## ✅ 예시 해석
+
+```bash
+ps aux | grep nginx
+
+```
+
+출력 예:
+
+```
+root      1638  0.0  0.5  55228  2200 ?  Ss  07:43  0:00 nginx: master process ...
+www-data  1639  0.0  1.3  55896  5912 ?  S   07:43  0:00 nginx: worker process
+
+```
+
+의미
+
+---
+
+```
+nginx
+```
+
+- 마스터 프로세스는 root 권한으로 실행 중
+
+---
+
+- 실제 웹 요청을 처리하는 워커 프로세스는 www-data 권한으로 실행됨
+
+---
+
+---
+
+## ✅ Nginx가 실행 중인지 확인하는 용도
+
+- `grep nginx`를 통해 `nginx` 프로세스가 **정상적으로 실행 중인지** 확인할 수 있습니다.
+- 실행 중이지 않다면 아무 결과도 나타나지 않거나, `grep nginx` 자체만 보입니다.
+
+---
+
+## ✅ 참고: `grep` 결과를 제외하려면?
+
+```bash
+ps aux | grep '[n]ginx'
+
+```
+
+→ 이렇게 하면 `grep nginx` 자체는 검색에서 제외됨
+
+---
+
+---
+
+## ✅ `ps aux`의 의미
+
+- `ps aux`에서 `aux`는 각각 다음을 의미하는 **옵션 조합**이며, 약자처럼 사용되지만 사실은 **세 개의 독립적인 옵션을 함께 쓴 형태**
+
+| 옵션 | 의미 |
+| --- | --- |
+| `a` | **모든 사용자**의 프로세스 표시 (터미널에 관계없이) |
+| `u` | 프로세스를 **소유한 사용자 이름(user)**과 **CPU/메모리 사용률** 등 추가 정보 표시 |
+| `x` | **터미널에 연결되지 않은 프로세스도 포함**해서 표시 (데몬 등 백그라운드 포함) |
+
+---
+
+## 📌 정리하면
+
+- `a`: all users
+- `u`: user format
+- `x`: include processes without controlling TTY
+
+즉, `ps aux`는:
+
+> 현재 실행 중인 시스템의 모든 프로세스를, 사용자/메모리/CPU 사용 정보와 함께, 터미널 연결 여부와 관계없이 모두 보여줘라.
+> 
+
+---
+
+## ✅ 예시
+
+```bash
+ps aux | grep nginx
+
+```
+
+→ 모든 프로세스 중 `nginx` 관련 프로세스만 필터링하여 상세 정보로 출력.
+
+---
+
+## ✅ 기타 참고
+
+- BSD 스타일: `ps aux`
+- SysV 스타일: `ps -ef` (같은 목적)
+
+`sudo chown ubuntu:www-data /home/ubuntu/pybo/pybo.sock` 명령은 
+
+---
+
+## ✅ `sudo chown ubuntu:www-data /home/ubuntu/pybo/pybo.sock`  명령어
+
+- 리눅스에서 **소켓 파일의 소유자와 그룹을 변경**하는 명령어
+
+```bash
+sudo chown ubuntu:www-data /home/ubuntu/pybo/pybo.sock
+
+```
+
+| 구성 요소 | 의미 |
+| --- | --- |
+| `sudo` | 관리자 권한으로 명령 실행 |
+| `chown` | 파일의 **소유자(owner)** 및 **그룹(group)** 변경 명령 |
+| `ubuntu:www-data` | 소유자 `ubuntu`, 그룹 `www-data` 로 설정 |
+| `/home/ubuntu/pybo/pybo.sock` | 변경 대상 파일 (Gunicorn의 UNIX 소켓 파일) |
+
+---
+
+## ✅ 이 명령이 필요한 이유
+
+- Gunicorn이 생성한 `.sock` 파일은 `ubuntu` 사용자가 소유
+- 하지만 Nginx는 `www-data` 사용자로 실행되기 때문에, 이 `.sock` 파일에 접근할 **권한이 필요**
+- 그룹을 `www-data`로 설정하면, `nginx`가 이 소켓을 통해 **프록시 요청을 전달할 수 있음**
+
+---
+
+## ✅ 이후 권한 확인 (예시)
+
+```bash
+ls -l /home/ubuntu/pybo/pybo.sock
+
+```
+
+출력 예:
+
+```
+srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
+
+```
+
+→ 소유자: `ubuntu`, 그룹: `www-data`
+
+→ `rw- rw- ---` 이므로 **ubuntu와 www-data는 읽기/쓰기 가능**
+
+---
+
+## ✅ 추가로 권장되는 조치
+
+### 🔹 서비스 유닛 파일에 `UMask=007` 추가
+
+```
+[Service]
+...
+UMask=007
+
+```
+
+→ 소켓이 생성될 때 권한이 `srw-rw----`로 설정되도록 보장
+
+---
+
+## ✅ 요약
+
+| 명령어 | 역할 |
+| --- | --- |
+| `sudo chown ubuntu:www-data ...` | 파일의 소유자 및 그룹 변경 |
+| `www-data` | Nginx가 사용하는 계정 |
+| `.sock` 파일 | Nginx ↔ Gunicorn 사이의 통신 매개체 |
+
+---
+
+- Gunicorn과 Nginx 간의 UNIX 소켓 연결에서 권한 문제는 매우 흔한 이슈이니, 이 원리를 이해하고 있으면 다른 서버에서도 잘 활용 가능.
+
+---
+
+### ✅ `srw-rw---- 1 ubuntu www-data ...`전체 출력:
+
+```bash
+srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
+
+```
+
+---
+
+## ✅ 필드별 상세 설명
+
+| 항목 | 예시 | 설명 |
+| --- | --- | --- |
+| **파일 종류 및 권한** | `srw-rw----` | **UNIX 소켓 파일**이며, 소유자와 그룹만 읽기/쓰기 가능 |
+| **링크 수** | `1` | 하드 링크 수 (소켓이므로 1) |
+| **소유자** | `ubuntu` | 파일을 만든 사용자 |
+| **그룹** | `www-data` | 파일이 속한 그룹 (주로 nginx가 사용하는 그룹) |
+| **크기** | `0` | 소켓 파일은 특별한 장치 파일이므로 크기 없음 |
+| **수정 시간** | `May 31 07:35` | 마지막으로 수정된 시각 |
+| **파일 경로** | `/home/ubuntu/pybo/pybo.sock` | 파일의 전체 경로 |
+
+---
+
+## ✅ 맨 앞 문자 구조 (`srw-rw----`)
+
+| 문자 | 의미 |
+| --- | --- |
+| `s` | **소켓 파일** (UNIX domain socket, inter-process communication용) |
+| `rw-` | 소유자(`ubuntu`)는 읽기(r), 쓰기(w) 가능 |
+| `rw-` | 그룹(`www-data`)도 읽기(r), 쓰기(w) 가능 |
+| `---` | 다른 사용자(others)는 접근 불가 |
+
+---
+
+## ✅ 이 권한이 중요한 이유
+
+- 이 `.sock` 파일은 **Gunicorn과 Nginx가 통신하는 연결 지점**.
+- `Gunicorn`이 만들고,
+- `Nginx`가 그 파일을 **proxy_pass**로 접근.
+- 따라서 Nginx가 실행되는 사용자(`www-data`)에게 **쓰기 권한**이 있어야 502 오류 없이 통신 가능
+
+---
+
+## ✅ 요약
+
+| 항목 | 의미 |
+| --- | --- |
+| `s` | UNIX 소켓 |
+| `rw-rw----` | `ubuntu`, `www-data`는 읽기/쓰기 가능 |
+| `.sock` | Gunicorn과 Nginx 간 통신용 소켓 |
+| `chown ubuntu:www-data` + `UMask=007` | 가장 안전하고 권장되는 설정 방식 |
+
+---
+
+---
+
+## ✅ `chmod` 명령어
+
+- **파일이나 디렉토리의 권한을 변경**할 때 사용
+
+```bash
+chmod [옵션] [권한] [파일명]
+
+```
+
+예:
+
+```bash
+chmod 660 /home/ubuntu/pybo/pybo.sock
+
+```
+
+---
+
+## ✅ 숫자 모드 권한 설정 예시
+
+| 명령어 | 설명 |
+| --- | --- |
+| `chmod 600 file` | 소유자만 읽기/쓰기 (rw-------) |
+| `chmod 660 file` | 소유자/그룹 읽기/쓰기 (rw-rw----) ← **Gunicorn 소켓에 권장** |
+| `chmod 644 file` | 소유자 쓰기, 모두 읽기 (rw-r--r--) |
+| `chmod 777 file` | 모든 사용자 읽기/쓰기/실행 (rwxrwxrwx) **⚠️비추천** |
+| `chmod 755 dir` | 디렉토리는 실행(x)이 있어야 들어갈 수 있음 |
+
+---
+
+## ✅ 문자 모드 권한 설정 예시
+
+```bash
+chmod u+rw pybo.sock     # 사용자에게 읽기, 쓰기 권한 추가
+chmod g+w pybo.sock      # 그룹에 쓰기 권한 추가
+chmod o-rwx pybo.sock    # 다른 사용자 권한 모두 제거
+
+```
+
+| 기호 | 의미 |
+| --- | --- |
+| `u` | 사용자 (owner) |
+| `g` | 그룹 (group) |
+| `o` | 기타 사용자 (others) |
+| `a` | 전체 사용자 (all) |
+| `+` | 권한 추가 |
+| `-` | 권한 제거 |
+| `=` | 권한 설정 |
+
+---
+
+## ✅ Gunicorn 소켓 권한에 적합한 예시
+
+```bash
+chmod 660 /home/ubuntu/pybo/pybo.sock
+
+```
+
+→ `srw-rw----`
+
+→ 소유자/그룹에게 읽기/쓰기 허용, others는 접근 차단
+
+→ Gunicorn(`ubuntu`)과 Nginx(`www-data`) 간 통신 허용
+
+---
+
+## ✅ 전체 권한 상태 확인
+
+```bash
+ls -l /home/ubuntu/pybo/pybo.sock
+
+```
+
+---
+
+## ✅ Tip: UMask로 기본 생성 권한 설정
+
+- `chmod`는 수동 변경이고
+- `UMask=007`을 systemd에 넣으면 `.sock`이 생성될 때부터 자동으로 권한 부여됨
+
+---
