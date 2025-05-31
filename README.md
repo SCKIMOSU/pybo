@@ -4113,7 +4113,7 @@ ls -l /home/ubuntu/pybo/pybo.sock
 
 ---
 
-## ✅ Tip: UMask로 기본 생성 권한 설정
+## ✅ UMask로 기본 생성 권한 설정
 
 - `chmod`는 수동 변경이고
 - `UMask=007`을 systemd에 넣으면 `.sock`이 생성될 때부터 자동으로 권한 부여됨
