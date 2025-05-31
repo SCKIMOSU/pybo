@@ -1,5 +1,6 @@
 # AWS Lightsail : Pybo + Nginx + Gunicorn 배포
 
+ ![db22.png](db22.png) 
 - pybo 저장소: [https://github.com/SCKIMOSU/pybo.git](https://github.com/SCKIMOSU/pybo.git)
 
 ---
