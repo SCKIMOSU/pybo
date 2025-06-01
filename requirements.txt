@@ -1,0 +1,6 @@
+Django>=4.0,<5.0
+gunicorn>=20.1.0
+markdown>=3.3.4
+# 선택 사항 (템플릿에서 사용될 수 있음)
+django-bootstrap4>=22.3
+# SQLite 지원 포함되어 있음 (기본 제공이므로 따로 설치 필요 없음)
