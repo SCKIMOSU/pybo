@@ -1910,7 +1910,6 @@ gunicorn  1576 ubuntu    5u  unix 0xffff880...   /home/ubuntu/pybo/pybo.sock
 /home/ubuntu/pybo/pybo.sock
 ```
 
-```
 /home/ubuntu/pybo/pybo.sock
 
 ```
@@ -2495,8 +2494,6 @@ sudo ln -s /etc/nginx/sites-available/pybo /etc/nginx/sites-enabled/
 
 ```
 
----
-
 - **심볼릭 링크(symlink)**  생성
     - 즉, `sites-available/pybo` 파일을 `sites-enable/` 디렉토리 내에서 **가상으로 연결**
 
@@ -2658,7 +2655,6 @@ sudo systemctl daemon-reload
 
 ```
 
-
 ## ✅ 언제 `daemon-reload`가 필요한가?
 
 | 상황 | 설명 |
@@ -2703,7 +2699,6 @@ sudo systemctl daemon-reload
 sudo systemctl restart gunicorn
 
 ```
-
 
 ## ✅ 왜 "daemon" 리로드인가?
 
@@ -2827,7 +2822,6 @@ location / {
 
 ---
 
----
 
 ## ✅ `.sock` 파일 정의
 
@@ -2961,8 +2955,6 @@ Client (웹 브라우저)
 
 ```
 
----
-
 ### 📂 파일 경로 예시
 
 ```bash
@@ -3040,8 +3032,6 @@ location / {
 
 ```
 
----
-
 ## ✅ 실생활 비유
 
 - 사용자가 직접 통신하는 대신 **대리인(프록시 서버)**에게 전달을 요청
@@ -3103,8 +3093,6 @@ proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
 | **forwarding** | 한 요청을 다른 목적지로 넘김 (동일 개념) |
 | **gateway** | 여러 시스템을 연결하는 입구 역할 |
 | **tunneling** | 요청을 통째로 감춰서 전달 (ex: HTTPS 프록시) |
-
----
 
 ---
 
@@ -3175,9 +3163,6 @@ proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
 
 ---
 
----
-
----
 
 ## ✅ **Forward Proxy(정방향 프록시)** 정의
 
@@ -3270,7 +3255,6 @@ proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
 
 ---
 
----
 
 ## ✅ **Reverse Proxy(리버스 프록시)**  정의
 
@@ -3331,8 +3315,6 @@ location / {
 }
 
 ```
-
----
 
 ## ✅ 예시 2: 로드 밸런싱
 
@@ -3416,8 +3398,6 @@ location / {
 
 ```
 
----
-
 ## ✅ 왜 이렇게 하나요?
 
 | 목적 | 설명 |
@@ -3458,7 +3438,6 @@ location / {
 
 ---
 
----
 
 ## ✅ 대표적인 Forward Proxy **(정방향 프록시)**  소프트웨어
 
@@ -3529,8 +3508,6 @@ tail [옵션] [파일명]
 
 ```
 
----
-
 ## ✅ 예시
 
 ```bash
@@ -3564,8 +3541,6 @@ tail -f /home/ubuntu/pybo/gunicorn.log
 
 ```
 
----
-
 ## ✅ `tail -f` vs `cat -f`?
 
 - `cat`은 전체 파일을 한번에 출력
@@ -3581,8 +3556,6 @@ tail -f /home/ubuntu/pybo/gunicorn.log
 Ctrl + C
 
 ```
-
----
 
 ## ✅ 함께 쓰면 좋은 명령
 
@@ -3628,8 +3601,6 @@ sudo systemctl status gunicorn
    Active: active (running) since ...
 
 ```
-
----
 
 ### 2. `ps aux | grep <프로세스명>`
 
@@ -3697,8 +3668,6 @@ sudo systemctl status gunicorn
 
 ```
 
----
-
 ## ✅ 요약
 
 | 명령어 | 용도 |
@@ -3708,8 +3677,6 @@ sudo systemctl status gunicorn
 | `pgrep <이름>` | 실행 중 PID 확인 |
 | `netstat` 또는 `ss` | 열려 있는 포트 확인 |
 | `journalctl -u <서비스>` | 실행 로그 확인 |
-
----
 
 ---
 
@@ -3772,7 +3739,6 @@ www-data  1639  0.0  1.3  55896  5912 ?  S   07:43  0:00 nginx: worker process
 
 ---
 
-```
 nginx
 ```
 
@@ -3784,7 +3750,6 @@ nginx
 
 ---
 
----
 
 ## ✅ Nginx가 실행 중인지 확인하는 용도
 
@@ -3804,7 +3769,6 @@ ps aux | grep '[n]ginx'
 
 ---
 
----
 
 ## ✅ `ps aux`의 의미
 
@@ -3933,8 +3897,6 @@ srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
 
 ```
 
----
-
 ## ✅ 필드별 상세 설명
 
 | 항목 | 예시 | 설명 |
@@ -3980,7 +3942,6 @@ srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
 
 ---
 
----
 
 ## ✅ `chmod` 명령어
 
@@ -3997,8 +3958,6 @@ chmod [옵션] [권한] [파일명]
 chmod 660 /home/ubuntu/pybo/pybo.sock
 
 ```
-
----
 
 ## ✅ 숫자 모드 권한 설정 예시
 
@@ -4054,8 +4013,239 @@ chmod 660 /home/ubuntu/pybo/pybo.sock
 ls -l /home/ubuntu/pybo/pybo.sock
 
 ```
+## ✅ 명령어 구성
+
+```bash
+sudo chmod 660 /home/ubuntu/pybo/pybo.sock
+
+```
+
+| 항목 | 의미 |
+| --- | --- |
+| `sudo` | 관리자(root) 권한으로 실행 |
+| `chmod` | 파일/소켓/디렉터리의 **권한(permission)**을 변경하는 명령어 |
+| `660` | 새로운 권한 설정 값 |
+| `/home/ubuntu/pybo/pybo.sock` | 변경할 대상 파일 (Gunicorn과 Nginx가 사용하는 UNIX 소켓) |
 
 ---
+
+## 🔐 `chmod 660` 의미
+
+- `660`은 **8진수 권한 값.** 각 자리는 다음을 의미:
+
+| 사용자 유형 | 권한 |
+| --- | --- |
+| **소유자 (User)** | 읽기(r), 쓰기(w) → `6` (4+2) |
+| **그룹 (Group)** | 읽기(r), 쓰기(w) → `6` (4+2) |
+| **기타 사용자 (Others)** | 권한 없음 → `0` |
+
+즉:
+
+```
+-rw-rw----  (660)
+
+```
+
+## ✅ UNIX 소켓의 경우 `660`으로 설정하는 이유
+
+- Gunicorn은 `.sock` 파일을 생성하고 **자신(소유자)과 지정된 그룹**만 접근할 수 있도록 제한.
+- Nginx는 이 `.sock` 파일에 **접속해서 프록시 연결**을 해야 하므로, 다음 조건이 필요:
+    - 소유자: gunicorn 실행 계정 (예: `ubuntu`)
+    - 그룹: nginx 실행 계정 그룹 (예: `www-data`)
+    - 접근 권한: 읽기/쓰기 (`rw-`)
+- 따라서 `chmod 660`을 하고:
+
+```bash
+sudo chown ubuntu:www-data /home/ubuntu/pybo/pybo.sock
+
+```
+
+을 함께 사용해야 nginx가 접근할 수 있음.
+
+---
+
+## ✅ 정리
+
+| 명령어 | 의미 |
+| --- | --- |
+| `chmod 660 pybo.sock` | 소유자/그룹만 읽기·쓰기 가능, 기타는 접근 불가 |
+| `chown ubuntu:www-data pybo.sock` | 소유자: `ubuntu`, 그룹: `www-data`로 설정 |
+- Gunicorn과 Nginx 간의 **유닉스 도메인 소켓 통신이 안전하고 정상적으로 통신**
+
+## ✅ 파일 권한(Permission)의 숫자 표현
+
+- Linux/Unix 시스템에서는 파일 권한을 **숫자(8진수)**로 표현.
+- 각 권한은 다음과 같은 **이진수 비트** 값을 가지며, 이를 더해서 숫자로 나타냄
+
+| 권한 종류 | 기호 | 이진수 | 8진수 값 |
+| --- | --- | --- | --- |
+| 읽기 | `r` | `100` | 4 |
+| 쓰기 | `w` | `010` | 2 |
+| 실행 | `x` | `001` | 1 |
+
+---
+
+## ✅ `6`의 의미: 4 + 2 = 6
+
+- `읽기(r)` → 4
+- `쓰기(w)` → 2
+    
+    → 두 권한을 모두 부여하면 `4 + 2 = 6`
+    
+- 따라서 `6`은 `rw-`를 의미. (읽기 + 쓰기, 실행은 없음)
+
+---
+
+## ✅ 예시: `chmod 660 file`
+
+- 이 명령은 다음 권한을 부여:
+
+| 대상 | 권한 | 기호 | 설명 |
+| --- | --- | --- | --- |
+| 사용자 | 6 | rw- | 읽기/쓰기 가능 |
+| 그룹 | 6 | rw- | 읽기/쓰기 가능 |
+| 기타 사용자 | 0 | --- | 아무 권한 없음 |
+
+---
+
+## ✅ 시각적으로 보면
+
+```bash
+-rw-rw---- 1 ubuntu www-data ... pybo.sock
+
+```
+
+## `chown ubuntu:www-data pybo.sock` 명령어
+
+- 리눅스에서 **파일 또는 디렉터리의 소유자(user)와 그룹(group)을 변경**할 때 사용.
+
+---
+
+## ✅ 명령어 구성 설명
+
+```bash
+chown ubuntu:www-data pybo.sock
+
+```
+
+| 부분 | 의미 |
+| --- | --- |
+| `chown` | change owner, 소유자 변경 명령어 |
+| `ubuntu:www-data` | **소유자: ubuntu**, **그룹: www-data**로 설정 |
+| `pybo.sock` | 대상 파일 (여기선 Gunicorn의 UNIX 소켓 파일) |
+
+---
+
+## 🔎 상세 설명
+
+- 이 명령은 다음을 수행:
+    - `pybo.sock`의 **소유자(user)** 를 `ubuntu`로 설정
+    - `pybo.sock`의 **그룹(group)** 을 `www-data`로 설정
+- 이렇게 하면:
+    - `ubuntu` 사용자 (예: Gunicorn이 실행 중인 계정)는 읽기/쓰기 가능
+    - `www-data` 그룹 (예: Nginx가 속한 그룹)은 읽기/쓰기 가능
+
+---
+
+## ✅ 왜 이렇게 해야 하나요?
+
+- UNIX 도메인 소켓을 사용하는 Gunicorn ↔ Nginx 연동에서는:
+    - Gunicorn이 `.sock` 파일을 생성 (보통 소유자는 Gunicorn 실행 사용자, 예: `ubuntu`)
+    - Nginx가 이 소켓 파일에 접근하여 요청을 전달해야 함
+    - 따라서 `.sock` 파일은 **그룹을 `www-data`로 지정하고**, Nginx가 **그룹을 통해 접근할 수 있어야 함**
+
+---
+
+## 🔐 보통 함께 쓰는 명령
+
+```bash
+sudo chown ubuntu:www-data pybo.sock
+sudo chmod 660 pybo.sock
+
+```
+
+- `chown`: 소유자 및 그룹 설정
+- `chmod`: `rw-rw----`로 권한 설정 (ubuntu와 www-data만 접근 가능)
+
+---
+
+## ✅ 결과 예시 (`ls -l pybo.sock`)
+
+```bash
+srw-rw---- 1 ubuntu www-data 0 6월  1 13:30 pybo.sock
+
+```
+
+## ✅ `www-data`란?
+
+- `www-data`는 리눅스 시스템에서 **웹 서버(Nginx, Apache 등)**가 속한 **기본 그룹**.
+    - 웹 서버 프로세스는 **보안상의 이유로 루트가 아닌 일반 사용자/그룹**으로 동작.
+    - 그중 대표적으로 많이 쓰이는 그룹이 바로 `www-data`.
+
+---
+
+## ✅ 왜 `www-data`로 설정하나요?
+
+- `Nginx`는 보통 다음과 같이 실행:
+
+```bash
+user www-data;
+
+```
+
+- 즉, Nginx는 `www-data` 사용자 또는 그룹 권한으로 실행되기 때문에,
+
+### 🔒 `www-data` 그룹 권한이 있어야:
+
+- **Gunicorn이 만든 소켓 파일 (`.sock`)에 접근 가능**
+- 정적 파일 디렉토리에서 **읽기 권한 허용 가능**
+- Django 서버와 **소켓으로 통신 가능**
+
+---
+
+## ✅ 예시 상황
+
+- `Gunicorn`이 `/home/ubuntu/pybo/pybo.sock` 생성 (소유자: ubuntu)
+- `Nginx`는 `www-data` 그룹으로 동작
+- 그래서 `.sock` 파일의 **그룹을 `www-data`로 설정**하고,
+- 권한을 `660` 또는 `664`로 주면 Nginx가 해당 소켓에 접근 가능
+
+```bash
+sudo chown ubuntu:www-data pybo.sock
+sudo chmod 660 pybo.sock
+
+```
+
+## ✅ 확인 방법
+
+```bash
+ps aux | grep nginx
+
+```
+
+- 결과 예:
+
+```bash
+www-data  1234  ... nginx: worker process
+
+```
+
+- 또는
+
+```bash
+grep 'user' /etc/nginx/nginx.conf
+
+```
+
+## ✅ 요약
+
+| 항목 | 설명 |
+| --- | --- |
+| `www-data` | 웹 서버(Nginx, Apache 등)의 기본 실행 그룹 |
+| 사용하는 이유 | 소켓, 정적 파일 등 접근을 위한 보안 격리 및 권한 제어 |
+| 설정 예시 | `chown ubuntu:www-data 파일`, `chmod 660 파일` |
+
+
 
 ## ✅ UMask로 기본 생성 권한 설정
 
