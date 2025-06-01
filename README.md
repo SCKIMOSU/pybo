@@ -4,7 +4,12 @@
 - pybo 저장소: [https://github.com/SCKIMOSU/pybo.git](https://github.com/SCKIMOSU/pybo.git)
 
 ---
+# `.sock` 파일
 
+- `.sock` 파일은 UNIX 도메인 소켓(Unix Domain Socket)을 위한 **특수 파일**
+- 네트워크를 거치지 않고 같은 머신 내의 **프로세스 간 고속 통신**
+- `pybo.sock`은 Django 앱(pybo)과 WSGI 서버(Gunicorn)가 통신할 수 있도록 만드는 **소켓 파일**
+  
 ## ✅ 전체 개요
 
 - 서버: AWS Lightsail (Ubuntu 22.04)
