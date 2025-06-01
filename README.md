@@ -691,12 +691,6 @@ ps aux | grep sshd
 
 ```
 
-또는
-
-```bash
-systemctl status nginx
-
----
 
 ## ✅ `systemctl`
 - 리눅스의 서비스 관리자 **systemd를 제어하는 명령어**
