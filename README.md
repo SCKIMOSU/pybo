@@ -4063,3 +4063,5 @@ ls -l /home/ubuntu/pybo/pybo.sock
 - `UMask=007`을 systemd에 넣으면 `.sock`이 생성될 때부터 자동으로 권한 부여됨
 
 ---
+## ✅http://43.201.51.144/static/bootstrap.min.css 에서 static 파일 확인 
+ ![static.png](static.png)
