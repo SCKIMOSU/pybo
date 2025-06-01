@@ -2293,6 +2293,8 @@ http://43.201.51.144
 
 ---
 
+## 🔥🔥 에러 내용 ##
+
 ```bash
 2025/06/01 14:59:51 [crit] 3739#3739: *1 connect() to unix:/home/ubuntu/pybo/pybo.sock failed (13: Permission de
 nied) while connecting to upstream, client: 121.160.219.130, server: 3.38.108.115, request: "GET / HTTP/1.1", up
@@ -2303,7 +2305,7 @@ stream: "http://unix:/home/ubuntu/pybo/pybo.sock:/", host: "3.38.108.115"
 connect() to unix:/home/ubuntu/pybo/pybo.sock failed (13: Permission denied)
 ```
 
-✅ 해결 방법 요약
+✅ 🔥해결 방법 요약
 1. 소켓 파일의 소유자와 권한을 수정
 ```bash
 sudo chown ubuntu:www-data /home/ubuntu/pybo/pybo.sock
@@ -2313,7 +2315,7 @@ sudo chmod 660 /home/ubuntu/pybo/pybo.sock
 - chown: 소유자 ubuntu, 그룹 www-data로 변경
 - chmod: 소유자와 그룹에게 읽기/쓰기 권한 부여
 
-2. 디렉터리 접근 권한도 확인
+2. 🔥디렉터리 접근 권한도 확인
 - 상위 디렉터리 /home/ubuntu/pybo가 www-data에게 접근 가능해야 함.
 
 ```bash
@@ -2323,7 +2325,7 @@ sudo chmod 755 /home/ubuntu/pybo
 
 - Nginx는 www-data 유저로 실행되므로 디렉터리를 들어가서 파일을 열 수 있어야 함 (x 실행 권한 필요).
 
-🔄 적용 후 순서대로 실행
+🔄 🔥적용 후 순서대로 실행
 ```bash
 # Gunicorn 소켓 다시 실행
 gunicorn --bind unix:/home/ubuntu/pybo/pybo.sock config.wsgi:application --daemon
@@ -2333,7 +2335,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-🔍 확인
+🔍 🔥확인
 ```bash
 # nginx 접근 로그 확인
 sudo tail -f /var/log/nginx/access.log
