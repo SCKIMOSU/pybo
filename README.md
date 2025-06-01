@@ -237,7 +237,7 @@ server {
 
     location / {
 
-        include proxy_params;
+        include /etc/nginx/proxy_params;
 
         proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
     }
