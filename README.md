@@ -1833,20 +1833,18 @@ ExecStart=/home/ubuntu/pybo/venv/bin/gunicorn --bind unix:/home/ubuntu/pybo/pybo
 ```bash
 sudo find / -type s -name "*.sock" 2>/dev/null
 
-```
+```bash
 
 → `.sock` 확장자를 가진 **모든 유닉스 도메인 소켓 파일**을 찾아줍니다.
 
 예시 출력:
 
-```
+```bash
 /home/ubuntu/pybo/pybo.sock
 /var/run/docker.sock
-...
-
+```
 
 > -type s는 유닉스 소켓만 찾겠다는 의미
-> 
 
 ---
 
