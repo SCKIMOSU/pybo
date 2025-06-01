@@ -182,17 +182,25 @@ sudo nano /etc/systemd/system/gunicorn.service
 
 ```
 [Unit]
+
 Description=Gunicorn daemon for pybo
+
 After=network.target
 
 [Service]
+
 User=ubuntu
+
 Group=www-data
+
 WorkingDirectory=/home/ubuntu/pybo
+
 ExecStart=/home/ubuntu/pybo/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/pybo/pybo.sock config.wsgi:application
+
 
 [Install]
 WantedBy=multi-user.target
+
 
 ```
 
