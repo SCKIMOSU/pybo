@@ -1587,7 +1587,7 @@ http://43.201.51.144
 
 ---
 
-## ✅ 관리자 페이지도 확인해 보세요
+## ✅ 관리자 페이지도 확인
 
 ```
 http://43.201.51.144/admin
@@ -3036,9 +3036,9 @@ location / {
 
 ---
 
-## ✅ 권한이 중요합니다
+## ✅ 권한이 중요
 
-`.sock` 파일은 "파일"처럼 동작하기 때문에, **퍼미션(permission)**이 매우 중요합니다.
+`.sock` 파일은 "파일"처럼 동작하기 때문에, **퍼미션(permission)**이 매우 중요
 
 ```bash
 ls -l pybo.sock
@@ -3072,7 +3072,87 @@ srw-rw---- 1 ubuntu www-data pybo.sock
 
 ---
 
+
+# `pybo.sock` 파일
+
+- `.sock` 파일은 UNIX 도메인 소켓(Unix Domain Socket)을 위한 **특수 파일**
+- 네트워크를 거치지 않고 같은 머신 내의 **프로세스 간 고속 통신**
+- `pybo.sock`은 Django 앱(pybo)과 WSGI 서버(Gunicorn)가 통신할 수 있도록 만드는 **소켓 파일**
+
 ---
+
+## ✅ `pybo.sock`의 구조 및 역할
+
+### 📌 구조 개념 (전체 구성도)
+
+```
+Client (웹 브라우저)
+   ↓
+[ Nginx (reverse proxy) ]
+   ↓
+[ Unix Socket File: /home/ubuntu/pybo/pybo.sock ]
+   ↓
+[ Gunicorn (WSGI 서버) ]
+   ↓
+[ Django (pybo 프로젝트) ]
+
+```
+
+---
+
+### 📂 파일 경로 예시
+
+```bash
+/home/ubuntu/pybo/pybo.sock
+
+```
+
+- **`pybo.sock`**: Gunicorn이 바인딩하는 소켓 파일
+- **Nginx**는 이 소켓 파일을 통해 요청을 Gunicorn에 전달함
+- Gunicorn은 요청을 처리하여 Django로 전달
+
+---
+
+### 🔧 파일 속성 예시 (`ls -l`)
+
+```bash
+srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
+
+```
+
+- `s`: **소켓 파일**임을 의미
+- `rw-rw----`: 소유자(ubuntu)와 그룹(www-data)가 읽기/쓰기 가능
+- `ubuntu www-data`: 권한 설정
+
+---
+
+### 🔧 Gunicorn 설정 예시 (`.service`)
+
+```
+ExecStart=/home/ubuntu/pybo/venv/bin/gunicorn \
+  --workers 3 \
+  --bind unix:/home/ubuntu/pybo/pybo.sock \
+  config.wsgi:application
+
+```
+
+### 🔧 Nginx 설정 예시 (`/etc/nginx/sites-available/pybo`)
+
+```
+location / {
+    proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
+    include proxy_params;
+}
+
+```
+
+### ⚠️ 주의 사항
+
+- `.sock` 파일은 **파일시스템 상에 존재**하지만 일반적인 텍스트 파일이 아님 (내용을 `cat`으로 확인할 수 없음)
+- 파일 권한이 잘못되면 `502 Bad Gateway` 발생
+- 서비스 재시작 시 `.sock` 파일이 자동 삭제/재생성되므로 **경로 존재 여부**와 **권한**을 항상 확인해야 함
+
+- 
 
 ## ✅ 프록시(proxy) 정의
 
