@@ -64,7 +64,7 @@ ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@<인스턴스_IP>
 
 ```
 
-예시:
+- 예시:
 
 ```bash
 ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
@@ -1311,7 +1311,7 @@ sudo tail -n 50 /var/log/nginx/error.log
 
 ---
 
-## sudo tail -n 50 /var/log/nginx/error.log 로그 분석
+## ✅ sudo tail -n 50 /var/log/nginx/error.log 로그 분석
 
 ```jsx
 connect() to unix:/home/ubuntu/pybo/pybo.sock failed (13: Permission denied
@@ -1347,7 +1347,9 @@ connect() to unix:/home/ubuntu/pybo/pybo.sock failed (13: Permission denied)
 
 - Nginx는 기본적으로 **`www-data`** 사용자로 실행됨
 
-### Gunicorn이 생성한 소켓 파일 `/home/ubuntu/pybo/pybo.sock`에 대해 Nginx(`www-data`)가 **읽기/쓰기 권한이 없음**
+---
+
+## ✅ Gunicorn이 생성한 소켓 파일 `/home/ubuntu/pybo/pybo.sock`에 대해 Nginx(`www-data`)가 **읽기/쓰기 권한이 없음**
 
 ---
 
@@ -1422,13 +1424,13 @@ ls -l /home/ubuntu/pybo/pybo.sock
 
 ```bash
 srw-rw---- 1 ubuntu www-data ... /home/ubuntu/pybo/pybo.sock
-
+```
 
 ---
 
 ## ✅ 접속 확인
 
-브라우저에서:
+- 브라우저에서:
 
 ```
 http://43.201.51.144
