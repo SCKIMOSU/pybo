@@ -167,7 +167,7 @@ python manage.py migrate
 
 ```bash
 # 테스트 실행
-gunicorn --bind 127.0.0.1:8000 config.wsgi
+gunicorn --bind 0:8000 config.wsgi:application
 
 ```
 
