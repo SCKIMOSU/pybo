@@ -25,8 +25,6 @@ ssh -i LightsailDefaultKey.pem ubuntu@43.201.51.144
 
 ```
 
----
-
 - Lightsail에서 SSH를 이용 서버 접속
     
     ![db.png](db.png)
@@ -73,8 +71,6 @@ ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
 
 ```
 
----
-
 ### 🔹 C. **Windows 사용자라면 PuTTY로 접속 (pem → ppk 변환 필요)**
 
 1. `.pem` 파일을 **PuTTYgen**으로 `.ppk` 변환
@@ -107,8 +103,6 @@ sudo apt install python3-pip python3-venv nginx git -y
 
 ```
 
----
-
 ![db.png](db%202.png)
 
 ![db.png](db%203.png)
@@ -125,8 +119,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 ```
-
----
 
 ![db.png](db%204.png)
 
@@ -158,8 +150,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'insecure_key_for_dev')
 
 ```
 
----
-
 ## ✅ 5. 정적 파일 수집 및 DB 마이그레이션
 
 ```bash
@@ -167,8 +157,6 @@ python manage.py collectstatic
 python manage.py migrate
 
 ```
-
----
 
 - pip install django 로 django를 설치하고  python manage.py collectstatic 명령어를 실행함
 - python manage.py migrate 실행하여 database를 생성함
@@ -193,8 +181,6 @@ gunicorn --bind 127.0.0.1:8000 config.wsgi
 sudo nano /etc/systemd/system/gunicorn.service
 
 ```
-
-```
 [Unit]
 Description=Gunicorn daemon for pybo
 After=network.target
@@ -216,8 +202,6 @@ sudo systemctl enable gunicorn
 
 ```
 
----
-
 ![db.png](db%209.png)
 
 ![db.png](db%2010.png)
@@ -226,8 +210,6 @@ sudo systemctl enable gunicorn
 
 ```bash
 sudo nano /etc/nginx/sites-available/pybo
-
-```
 
 ```
 server {
@@ -256,8 +238,6 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 ```
-
----
 
 - 심볼릭 링크가 파일 존재하면 존재한다고 알려 줌
 
@@ -373,8 +353,6 @@ sudo certbot --nginx -d YOUR_DOMAIN
 
 ```
 
----
-
 ## ✅ 12. 검증
 
 브라우저 접속:
@@ -385,8 +363,6 @@ http://<YOUR_PUBLIC_IP>
 http://<YOUR_DOMAIN>
 
 ```
-
----
 
 ## ✅ 자주 발생되는 문제
 
@@ -406,8 +382,6 @@ http://<YOUR_DOMAIN>
                 [ Django app (pybo) ]
 
 ```
-
----
 
 - 실행 화면
     - 파이보 서비스가 AWS **43.201.51.144 (외부 서버)에서 동작중**
@@ -504,8 +478,6 @@ ssh -i ./LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
 
 ```
 
----
-
 ## ✅ 6. 오류 메시지 분석 (필요시 전체 출력 공유)
 
 접속 시 나오는 **오류 메시지 전체**를 복사해서 보내주시면, 어떤 단계에서 막히는지 정확히 분석 가능합니다.
@@ -534,8 +506,6 @@ sudo apt update
 sudo apt install nginx -y
 
 ```
-
----
 
 ## ✅ pybo 프로젝트의 requirements.txt 예시 (nginx 제외)
 
@@ -594,8 +564,6 @@ sudo cat /etc/systemd/system/gunicorn.service
 
 ```
 
----
-
 ### 2️⃣ 올바른 예시: gunicorn.service
 
 ```
@@ -644,8 +612,6 @@ WantedBy=multi-user.target
     ```
     
 
----
-
 ### ✅ 로그 확인 (에러 원인 자세히 보기)
 
 ```bash
@@ -665,8 +631,6 @@ journalctl -xe
 | 오타 (예: `ExceStart`) | `bad unit file setting` |
 | `User=ubuntu`인데 존재 안함 | `Failed to determine user credentials` |
 | `WorkingDirectory` 경로 없음 | `chdir() to /home/... failed: No such` |
-
----
 
 ---
 
@@ -752,8 +716,6 @@ systemctl status nginx
 
 ```
 
----
-
 ## 🧾 어원
 
 - `daemon`은 고대 그리스어 **δαίμων (daimon)** 에서 유래
@@ -814,9 +776,6 @@ sudo systemctl disable gunicorn
 sudo systemctl daemon-reload
 
 ```
-
----
-
 ## ✅ systemctl이 관리하는 대상
 
 - `systemctl`은 단순히 서비스만 관리하는 것이 아니라, 다음도 관리
@@ -849,8 +808,6 @@ sudo systemctl status gunicorn
 
 ```
 
----
-
 ## 🔍 `systemd` vs `systemctl`
 
 | 항목 | 설명 |
@@ -878,8 +835,6 @@ home/ubuntu/pybo/pybo.sock config.wsgi:application
 WanredBy=multi-user.target
 ```
 
----
-
 ## ❌ 잘못된 부분 요약
 
 1. `[Services]` → **오타**, 올바른 섹션 이름은 `[Service]`
@@ -905,16 +860,12 @@ WantedBy=multi-user.target
 
 ```
 
----
-
 ## 🔧 수정 방법
 
 ```bash
 sudo nano /etc/systemd/system/gunicorn.service
 
 ```
-
----
 
 ## 🔄 수정 후 재로드 및 실행
 
@@ -925,8 +876,6 @@ sudo systemctl status gunicorn
 
 ```
 
----
-
 ## ✅ 결과 확인
 
 정상이라면 `status`에서 다음과 같은 메시지가 확인
@@ -936,8 +885,6 @@ Active: active (running)
 Main PID: 12345 (gunicorn)
 
 ```
-
----
 
 ✅ **정상** 
 
@@ -978,8 +925,6 @@ Active: active (running)
 Listening at: unix:/home/ubuntu/pybo/pybo.sock
 
 ```
-
----
 
 ## 🔜 다음 단계: Nginx 설정
 
@@ -1026,8 +971,6 @@ sudo ln -s /etc/nginx/sites-available/pybo /etc/nginx/sites-enabled
 
 ```
 
----
-
 ## ✅ 3. 설정 문법 체크 및 재시작
 
 ```bash
@@ -1035,8 +978,6 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 ```
-
----
 
 ## ✅ 4. 방화벽 확인 (Lightsail 콘솔)
 
@@ -1057,8 +998,6 @@ sudo systemctl restart nginx
 http://<YOUR_PUBLIC_IP>
 
 ```
-
----
 
 ## `502 Bad Gateway` 웹사이트 오류
 
@@ -1105,8 +1044,6 @@ sudo chmod 660 /home/ubuntu/pybo/pybo.sock
 
 ```
 
----
-
 ### 2️⃣ Nginx 설정 확인
 
 ```bash
@@ -1133,8 +1070,6 @@ sudo nginx -t    # 문법 검사
 sudo systemctl restart nginx
 
 ```
-
----
 
 ### 4️⃣ Gunicorn이 제대로 실행 중인지 재확인
 
@@ -1179,8 +1114,6 @@ sudo systemctl restart gunicorn
 
 ```
 
----
-
 ## Gunicorn 측에 문제가 없을 때
 
 - `pybo.sock` 파일이 다음과 같이 **정상적으로 존재하고 권한도 충분**
@@ -1194,7 +1127,6 @@ srwxrwxrwx 1 ubuntu www-data 0 May 31 07:25 /home/ubuntu/pybo/pybo.sock
 
 ```
 
----
 
 ## ✅ 다음 점검: Nginx 설정 확인
 
@@ -1251,8 +1183,6 @@ sudo ln -s /etc/nginx/sites-available/pybo /etc/nginx/sites-enabled/
 
 ```
 
----
-
 ### 3️⃣ 설정 테스트 및 재시작
 
 ```bash
@@ -1260,9 +1190,6 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 ```
-
----
-
 ### 4️⃣ 여전히 502면: 로그 확인
 
 ```bash
@@ -1371,15 +1298,11 @@ server {
 
 ```
 
----
-
 ## ✅ 저장 후 실행 순서
 
 ```bash
 sudo nginx -t
 sudo systemctl restart nginx
-
-```
 
 ---
 
@@ -1502,8 +1425,6 @@ WantedBy=multi-user.target
 
 ```
 
----
-
 ### 🔄 3. 서비스 리로드 및 재시작
 
 ```bash
@@ -1512,8 +1433,6 @@ sudo systemctl restart gunicorn
 sudo systemctl restart nginx
 
 ```
-
----
 
 ### ✅ 4. 소켓 권한 재확인
 
@@ -1527,7 +1446,6 @@ ls -l /home/ubuntu/pybo/pybo.sock
 ```bash
 srw-rw---- 1 ubuntu www-data ... /home/ubuntu/pybo/pybo.sock
 
-```
 
 ---
 
@@ -1540,15 +1458,12 @@ http://43.201.51.144
 
 ```
 
----
-
 ## 아래 소켓 권한은 **정상적이며 보안적으로도 안전한 상태**
 
 ```jsx
 srw-rw---- 1 ubuntu www-data 0 May 31 07:35 /home/ubuntu/pybo/pybo.sock
 ```
 
-```
 srw-rw---- 1 ubuntu www-data ...
 
 ```
@@ -1571,8 +1486,6 @@ srw-rw---- 1 ubuntu www-data ...
 sudo systemctl restart nginx
 
 ```
-
----
 
 ### 🌐 웹브라우저 접속
 
@@ -1619,8 +1532,6 @@ http://43.201.51.144/admin
 nginx/1.18.0 (Ubuntu)
 ```
 
----
-
 ## ✅ 1. Gunicorn 서비스 상태 확인
 
 - 먼저 Gunicorn이 **정상 실행 중인지** 확인:
@@ -1654,9 +1565,6 @@ journalctl -u gunicorn -n 50 --no-pager
 sudo systemctl restart gunicorn
 
 ```
-
----
-
 ## ✅ 4. Gunicorn 수동 실행 (테스트용)
 
 - 만약 오류가 있다면 수동으로 Gunicorn 실행해서 디버그:
@@ -1794,8 +1702,6 @@ sudo systemctl restart nginx
 
 ```
 
----
-
 ## ✅ 확인 URL
 
 - 브라우저에서:
@@ -1816,8 +1722,6 @@ sudo tail -n 50 /var/log/nginx/error.log
 
 ```
 
----
-
 ## ✅ 마지막 요약 체크리스트
 
 | 항목 | 상태 |
@@ -1832,8 +1736,6 @@ sudo tail -n 50 /var/log/nginx/error.log
 ---
 
 ## `502 Bad Gateway` 문제를 디버깅할 때 핵심 중 하나가 **Nginx에서 지정한 `.sock` 경로와 Gunicorn에서 실제로 생성한 `.sock` 경로가 정확히 일치하는가임**.
-
- 
 
 ---
 
@@ -1963,7 +1865,6 @@ sudo find / -type s -name "*.sock" 2>/dev/null
 /var/run/docker.sock
 ...
 
-```
 
 > -type s는 유닉스 소켓만 찾겠다는 의미
 > 
@@ -1992,8 +1893,6 @@ sudo lsof -U
 gunicorn  1576 ubuntu    5u  unix 0xffff880...   /home/ubuntu/pybo/pybo.sock
 
 ```
-
----
 
 ## 📌 요약
 
@@ -2059,8 +1958,6 @@ srw-rw---- 1 ubuntu www-data ...
 
 ```
 
----
-
 ## ✅ Nginx 재시작
 
 - 설정이 정확하다면 아래 명령어로 다시 시작:
@@ -2070,8 +1967,6 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 ```
-
----
 
 ## ✅ 브라우저 접속
 
@@ -2166,7 +2061,7 @@ ps aux | grep nginx
 
 ```
 
-- → 아래와 같은 줄이 있어야 함
+- 아래와 같은 줄이 있어야 함
 
 ```
 www-data  ... nginx: worker process
@@ -2206,8 +2101,6 @@ sudo systemctl restart gunicorn
 
 ```
 
----
-
 ## ✅ 4. `/home/ubuntu/pybo` 폴더 접근 권한 확인
 
 - 폴더 자체가 `www-data`가 접근 가능한지 확인:
@@ -2240,8 +2133,6 @@ chmod o+x /home/ubuntu/pybo
 
 ```
 
----
-
 ## ✅ 5. 다시 Nginx 재시작
 
 ```bash
@@ -2249,16 +2140,12 @@ sudo systemctl restart nginx
 
 ```
 
----
-
 ## ✅ 마지막으로 다시 접속 확인:
 
 ```bash
 http://43.201.51.144
 
 ```
-
----
 
 ## ✅ 결론
 
@@ -2343,8 +2230,6 @@ sudo systemctl restart nginx
 
 ```
 
----
-
 ## ✅ 다시 접속 확인
 
 브라우저에서 접속:
@@ -2353,8 +2238,6 @@ sudo systemctl restart nginx
 http://43.201.51.144
 
 ```
-
----
 
 ## 🎯 정리
 
@@ -2413,8 +2296,6 @@ sudo systemctl restart nginx
 
 ```
 
----
-
 ## ✅ 브라우저 확인
 
 ```
@@ -2454,8 +2335,6 @@ ssh -i ~/LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
 
 ```
 
----
-
 ## ✅ 2. Gunicorn 서비스 다시 시작
 
 ```bash
@@ -2488,7 +2367,6 @@ sudo nginx -t && sudo systemctl restart nginx
 
 ```
 
----
 
 ## ✅ 4. 소켓 파일 권한 확인 (필수)
 
@@ -2512,7 +2390,6 @@ sudo chmod 660 /home/ubuntu/pybo/pybo.sock
 
 ```
 
----
 
 ## ✅ 5. 서비스 정상 확인
 
@@ -2540,8 +2417,6 @@ http://43.201.51.144
     ```
     
 
----
-
 ## ✅ Tip: 서버 재부팅 시 자동 시작 설정 (한 번만 수행)
 
 ```bash
@@ -2549,8 +2424,6 @@ sudo systemctl enable gunicorn
 sudo systemctl enable nginx
 
 ```
-
----
 
 
 # Lightsail 관련 개념
@@ -2595,8 +2468,6 @@ ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@<인스턴스_IP>
 ssh -i LightsailDefaultKey-ap-northeast-2.pem ubuntu@43.201.51.144
 
 ```
-
----
 
 ### 🔹 C. **Windows 사용자라면 PuTTY로 접속 (pem → ppk 변환 필요)**
 
@@ -2667,8 +2538,6 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 ```
-
----
 
 ## 📌 비유
 
@@ -2790,7 +2659,6 @@ sudo systemctl daemon-reload
 
 ```
 
----
 
 ## ✅ 언제 `daemon-reload`가 필요한가?
 
@@ -2837,7 +2705,6 @@ sudo systemctl restart gunicorn
 
 ```
 
----
 
 ## ✅ 왜 "daemon" 리로드인가?
 
@@ -2849,8 +2716,6 @@ sudo systemctl restart gunicorn
 ## 📌 주의
 
 `daemon-reload`는 서비스 재시작을 하지 않으므로, **변경 반영을 위해 반드시 `restart`도 같이 함.**
-
----
 
 ---
 
@@ -2951,7 +2816,6 @@ location / {
 
 ```
 
----
 
 ## ✅ 요약
 
@@ -3152,7 +3016,7 @@ location / {
 - 파일 권한이 잘못되면 `502 Bad Gateway` 발생
 - 서비스 재시작 시 `.sock` 파일이 자동 삭제/재생성되므로 **경로 존재 여부**와 **권한**을 항상 확인해야 함
 
-- 
+ 
 
 ## ✅ 프록시(proxy) 정의
 
