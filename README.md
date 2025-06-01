@@ -632,7 +632,6 @@ journalctl -xe
 | `User=ubuntu`인데 존재 안함 | `Failed to determine user credentials` |
 | `WorkingDirectory` 경로 없음 | `chdir() to /home/... failed: No such` |
 
----
 
 ## 🧙‍♂️ 데몬(daemon)이란?
 
