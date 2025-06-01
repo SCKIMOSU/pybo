@@ -221,18 +221,24 @@ sudo systemctl enable gunicorn
 sudo nano /etc/nginx/sites-available/pybo
 
 ```
+```
 server {
+
     listen 80;
+
     server_name YOUR_DOMAIN_OR_IP;
 
     location = /favicon.ico { access_log off; log_not_found off; }
 
     location /static/ {
+
         root /home/ubuntu/pybo;
     }
 
     location / {
+
         include proxy_params;
+
         proxy_pass http://unix:/home/ubuntu/pybo/pybo.sock;
     }
 }
