@@ -1837,7 +1837,7 @@ sudo find / -type s -name "*.sock" 2>/dev/null
 
 → `.sock` 확장자를 가진 **모든 유닉스 도메인 소켓 파일**을 찾아줍니다.
 
-예시 출력:
+- 예시 출력:
 
 ```bash
 /home/ubuntu/pybo/pybo.sock
@@ -1888,8 +1888,8 @@ gunicorn  1576 ubuntu    5u  unix 0xffff880...   /home/ubuntu/pybo/pybo.sock
 /home/ubuntu/pybo/pybo.sock
 ```
 
+```bash
 /home/ubuntu/pybo/pybo.sock
-
 ```
 
 - 이것이 **현재 Gunicorn이 생성한 실제 `.sock` 파일 경로**
