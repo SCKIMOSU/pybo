@@ -199,6 +199,7 @@ ExecStart=/home/ubuntu/pybo/venv/bin/gunicorn --access-logfile - --workers 3 --b
 
 
 [Install]
+
 WantedBy=multi-user.target
 
 
